@@ -24,6 +24,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jumping")]
     [SerializeField] private float jumpHeight = 2.0f;
 
+    [Header("Air Movement")]
+    [SerializeField][Range(0.0f, 1.0f)] private float airControl = 0.35f;
+
     [Header("Other Stuff")]
     private Vector3 groundVelocity = Vector3.zero;
     private float verticalVelocity = 0.0f;
@@ -62,14 +65,19 @@ public class PlayerMovement : MonoBehaviour
         // Check if the player is giving input.
         bool bIsMoving = desiredDirection.sqrMagnitude > 0.01f;
 
-        // Stops player from accelerating and decelerating when in the air. (Will be handled by a seperate system)
-        if (controller.isGrounded)
+        // Calculate acceleration based on if the player is on the floor or not.
+        float currentAcceleration = controller.isGrounded ? acceleration : acceleration * airControl;
+        
+        // Apply acceleration while moving.
+        if (bIsMoving)
         {
-            // Use acceleration if moving, or deceleration if not.
-            float rate = bIsMoving ? acceleration : deceleration;
+            groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, currentAcceleration * Time.deltaTime);
+        }
 
-            // Gradually set the player's velocity towards the target velocity.
-            groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
+        // Only decelerate while on the ground.
+        else if (controller.isGrounded)
+        {
+            groundVelocity = Vector3.MoveTowards(groundVelocity, Vector3.zero, deceleration * Time.deltaTime);
         }
 
         //===============
