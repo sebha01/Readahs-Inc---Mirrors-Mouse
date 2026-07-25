@@ -17,8 +17,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float maxSpeed = 8.0f;
     [SerializeField] private float acceleration = 2.0f;
     [SerializeField] private float deceleration = 20.0f;
-    private Vector3 currentVelocity = Vector3.zero;
-
+    private Vector3 groundVelocity = Vector3.zero;
+    private float verticalVelocity = 0.0f;
 
     // Update is called once per frame
     void Update()
@@ -30,22 +30,20 @@ public class PlayerMovement : MonoBehaviour
         //Read movement value recieved by player input component
         Vector2 moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
-        //get x and z from move input
-        x = moveInput.x;
-        z = moveInput.y;
 
         //============================
         // Calculate Desired Movement
         //============================
 
         // Convert the input into a direction relative to where they're facing.
-        Vector3 desiredDirection = transform.right * x + transform.forward * z;
+        Vector3 desiredDirection = transform.right * moveInput.x + transform.forward * moveInput.y;
 
         // Stops diagonal movement from being faster.
         desiredDirection.Normalize();
 
         // Calculates the velocity the player should reach.
         Vector3 targetVelocity = desiredDirection * maxSpeed;
+
 
         //================
         // Apply Momentum 
@@ -58,9 +56,9 @@ public class PlayerMovement : MonoBehaviour
         float rate = bIsMoving ? acceleration : deceleration;
 
         // Gradually set the player's velocity towards the target velocity.
-        currentVelocity = Vector3.MoveTowards(currentVelocity, targetVelocity, rate * Time.deltaTime);
+        groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
 
         // Move the player.
-        controller.Move(currentVelocity * Time.deltaTime);
+        controller.Move(groundVelocity * Time.deltaTime);
     }
 }
