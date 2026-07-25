@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     //movement variables
     [Header("Movement Variables")]
     [SerializeField] private float maxSpeed = 8.0f;
-    [SerializeField] private float acceleration = 18.0f;
+    [SerializeField] private float acceleration = 2.0f;
     [SerializeField] private float deceleration = 20.0f;
     private Vector3 currentVelocity = Vector3.zero;
 
@@ -31,7 +31,12 @@ public class PlayerMovement : MonoBehaviour
         z = moveInput.y;
 
         //move player in direction based on input recieved
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
+        Vector3 desiredDirection = transform.right * x + transform.forward * z;
+        desiredDirection.Normalize();
+
+        Vector3 targetVelocity = desiredDirection * maxSpeed;
+        currentVelocity = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
+
+        controller.Move(currentVelocity * Time.deltaTime);
     }
 }
