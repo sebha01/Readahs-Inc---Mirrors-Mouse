@@ -1708,7 +1708,7 @@ MonoBehaviour:
   playerInput: {fileID: 2055956036}
   controller: {fileID: 2055956034}
   maxSpeed: 8
-  acceleration: 1
+  acceleration: 2
   deceleration: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

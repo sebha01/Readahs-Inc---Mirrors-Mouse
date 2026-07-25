@@ -23,6 +23,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //==================
+        // Get Player Input
+        //==================
+
         //Read movement value recieved by player input component
         Vector2 moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
@@ -30,13 +34,33 @@ public class PlayerMovement : MonoBehaviour
         x = moveInput.x;
         z = moveInput.y;
 
-        //move player in direction based on input recieved
+        //============================
+        // Calculate Desired Movement
+        //============================
+
+        // Convert the input into a direction relative to where they're facing.
         Vector3 desiredDirection = transform.right * x + transform.forward * z;
+
+        // Stops diagonal movement from being faster.
         desiredDirection.Normalize();
 
+        // Calculates the velocity the player should reach.
         Vector3 targetVelocity = desiredDirection * maxSpeed;
-        currentVelocity = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.deltaTime);
 
+        //================
+        // Apply Momentum 
+        //================
+
+        // Check if the player is giving input.
+        bool bIsMoving = desiredDirection.sqrMagnitude > 0.01f;
+
+        // Use acceleration if moving, or deceleration if not.
+        float rate = bIsMoving ? acceleration : deceleration;
+
+        // Gradually set the player's velocity towards the target velocity.
+        currentVelocity = Vector3.MoveTowards(currentVelocity, targetVelocity, rate * Time.deltaTime);
+
+        // Move the player.
         controller.Move(currentVelocity * Time.deltaTime);
     }
 }
