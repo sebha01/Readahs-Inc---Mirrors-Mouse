@@ -10,7 +10,7 @@ public class MouseLook : MonoBehaviour
     [Header("Mouse Settings")]
     public float mouseSensitivity = 100.0f;
 
-    [Header("Player References")]
+    [Header("Player Component References")]
     [SerializeField]private PlayerInput playerInput;
     public Transform playerBody;
 
