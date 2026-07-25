@@ -62,11 +62,15 @@ public class PlayerMovement : MonoBehaviour
         // Check if the player is giving input.
         bool bIsMoving = desiredDirection.sqrMagnitude > 0.01f;
 
-        // Use acceleration if moving, or deceleration if not.
-        float rate = bIsMoving ? acceleration : deceleration;
+        // Stops player from accelerating and decelerating when in the air. (Will be handled by a seperate system)
+        if (controller.isGrounded)
+        {
+            // Use acceleration if moving, or deceleration if not.
+            float rate = bIsMoving ? acceleration : deceleration;
 
-        // Gradually set the player's velocity towards the target velocity.
-        groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
+            // Gradually set the player's velocity towards the target velocity.
+            groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
+        }
 
         //===============
         // Gravity Stuff 
