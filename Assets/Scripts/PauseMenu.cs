@@ -27,6 +27,7 @@ public class PauseMenu : MonoBehaviour
             if (isPaused)
             {
                 Resume();
+                HideCursor();
             }
             else
             {
@@ -35,14 +36,17 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    private void HideCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     public void Resume()
     {
         //Hide pause menu UI
         pauseMenuUI.SetActive(false);
         //Set time back so everything moves normally again
         Time.timeScale = 1.0f;
-        //Make cursor disapear for camera movement
-        Cursor.lockState = CursorLockMode.Locked;
         isPaused = false;
     }
 
@@ -59,11 +63,7 @@ public class PauseMenu : MonoBehaviour
 
     public void OnMainMenuClick()
     {
-        //Hide pause menu UI
-        pauseMenuUI.SetActive(false);
-        //Set time back so everything moves normally again
-        Time.timeScale = 1.0f;
-        isPaused = false;
+        Resume();
         SceneManager.LoadScene("Start");
     }
 }

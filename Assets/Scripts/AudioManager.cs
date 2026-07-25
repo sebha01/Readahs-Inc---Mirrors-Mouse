@@ -28,6 +28,11 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
+        if (PauseMenu.isPaused)
+        {
+            s.source.pitch *= .5f;
+        }
+
         s.source.Play();
     }
 }
