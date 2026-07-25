@@ -13,13 +13,20 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController controller;
 
     //movement variables
-    [Header("Movement Variables")]
+    [Header("Ground Movement")]
     [SerializeField] private float maxSpeed = 8.0f;
     [SerializeField] private float acceleration = 2.0f;
     [SerializeField] private float deceleration = 20.0f;
+    
+    [Header("Gravity")]
+    [SerializeField] private float gravity = -20.0f;
+
+    [Header("Jumping")]
+    [SerializeField] private float jumpHeight = 2.0f;
+
+    [Header("Other Stuff")]
     private Vector3 groundVelocity = Vector3.zero;
     private float verticalVelocity = 0.0f;
-    [SerializeField] private float gravity = -20.0f;
 
     // Update is called once per frame
     void Update()
@@ -31,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
         //Read movement value recieved by player input component
         Vector2 moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
+        // Check if jump was pressed.
+        bool jumpPressed = playerInput.actions["Jump"].WasPressedThisFrame();
 
         //============================
         // Calculate Desired Movement
@@ -59,6 +68,10 @@ public class PlayerMovement : MonoBehaviour
         // Gradually set the player's velocity towards the target velocity.
         groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
 
+        //===============
+        // Gravity Stuff 
+        //===============
+
         //  Apply gravity
         verticalVelocity += gravity * Time.deltaTime;
 
@@ -66,6 +79,15 @@ public class PlayerMovement : MonoBehaviour
         if (controller.isGrounded && verticalVelocity < 0.0f)
         {
             verticalVelocity = -2.0f;
+        }
+
+        //=========
+        // Jumping 
+        //=========
+
+        if (jumpPressed && controller.isGrounded)
+        {
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -2.0f * gravity);
         }
 
         Vector3 movement = groundVelocity + Vector3.up * verticalVelocity;
