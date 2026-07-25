@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float deceleration = 20.0f;
     private Vector3 groundVelocity = Vector3.zero;
     private float verticalVelocity = 0.0f;
+    [SerializeField] private float gravity = -20.0f;
 
     // Update is called once per frame
     void Update()
@@ -58,7 +59,18 @@ public class PlayerMovement : MonoBehaviour
         // Gradually set the player's velocity towards the target velocity.
         groundVelocity = Vector3.MoveTowards(groundVelocity, targetVelocity, rate * Time.deltaTime);
 
+        //  Apply gravity
+        verticalVelocity += gravity * Time.deltaTime;
+
+        // Stop vertical velocity from occuring if the player is grounded.
+        if (controller.isGrounded && verticalVelocity < 0.0f)
+        {
+            verticalVelocity = -2.0f;
+        }
+
+        Vector3 movement = groundVelocity + Vector3.up * verticalVelocity;
+
         // Move the player.
-        controller.Move(groundVelocity * Time.deltaTime);
+        controller.Move(movement * Time.deltaTime);
     }
 }
