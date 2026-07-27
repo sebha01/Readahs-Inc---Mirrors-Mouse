@@ -30,14 +30,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Wall Detection")]
     [SerializeField] private float wallCheckDistance = 0.75f;
     [SerializeField] private LayerMask wallLayer;
-
-    [Header("Other Stuff")]
-    private Vector3 groundVelocity = Vector3.zero;
-    private float verticalVelocity = 0.0f;
     private RaycastHit leftWallHit;
     private RaycastHit rightWallHit;
     private bool bWallOnLeft = false;
     private bool bWallOnRight = false;
+
+    [Header("Wall Running")]
+    private bool bIsWallRunning = false;
+
+    [Header("Other Stuff")]
+    private Vector3 groundVelocity = Vector3.zero;
+    private float verticalVelocity = 0.0f;
+    
+
 
     // Update is called once per frame
     void Update()
@@ -120,12 +125,29 @@ public class PlayerMovement : MonoBehaviour
         bWallOnRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallCheckDistance, wallLayer);
         bWallOnLeft= Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallCheckDistance, wallLayer);
         
+        //==============
+        // Wall Running
+        //==============
         
+        if (!controller.isGrounded && (bWallOnLeft ||bWallOnRight))
+        {
+            bIsWallRunning = true;
+        }
+        else
+        {
+            bIsWallRunning = false;
+        }
+
+        if (bIsWallRunning)
+        {
+            Debug.Log("Wall Running");
+        }
 
         // Move the player.
         controller.Move(movement * Time.deltaTime);
     }
-
+    
+    // Not used yet. Only here in case bug occurs later with just the layer check.
     private bool isWallRunnable(RaycastHit wallHit)
     {
         return Mathf.Abs(wallHit.normal.y) < 0.2f;
