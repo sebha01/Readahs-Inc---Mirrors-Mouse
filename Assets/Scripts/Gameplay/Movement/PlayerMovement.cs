@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -37,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Wall Running")]
     private bool bIsWallRunning = false;
+    [SerializeField] private float wallRunGravityMultiplier = 0.35f;
 
     [Header("Other Stuff")]
     private Vector3 groundVelocity = Vector3.zero;
@@ -66,6 +68,28 @@ public class PlayerMovement : MonoBehaviour
 
         // Stops diagonal movement from being faster.
         desiredDirection.Normalize();
+
+        if (bIsWallRunning)
+        {
+            Vector3 wallDirection;
+
+            if (bWallOnLeft)
+            {
+                wallDirection = Vector3.Cross(Vector3.up, leftWallHit.normal);
+            }
+            else
+            {
+                wallDirection = Vector3.Cross(rightWallHit.normal, Vector3.up);
+            }
+
+            if (Vector3.Dot(groundVelocity, wallDirection) < 0)
+            {
+                wallDirection = -wallDirection;
+            }
+
+            desiredDirection = wallDirection;
+            desiredDirection.Normalize();
+        }
 
         // Calculates the velocity the player should reach.
         Vector3 targetVelocity = desiredDirection * maxSpeed;
@@ -97,8 +121,17 @@ public class PlayerMovement : MonoBehaviour
         // Gravity Stuff 
         //===============
 
-        //  Apply gravity
-        verticalVelocity += gravity * Time.deltaTime;
+        // Use normal gravity by default.
+        float currentGravity = gravity;
+
+        // Reduce gravity while wall running.
+        if (bIsWallRunning)
+        {
+            currentGravity *= wallRunGravityMultiplier;
+        }
+
+        // Apply gravity.
+        verticalVelocity += currentGravity * Time.deltaTime;
 
         // Stop vertical velocity from occuring if the player is grounded.
         if (controller.isGrounded && verticalVelocity < 0.0f)
@@ -129,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
         // Wall Running
         //==============
         
-        if (!controller.isGrounded && (bWallOnLeft ||bWallOnRight))
+        if (!controller.isGrounded && (bWallOnLeft || bWallOnRight))
         {
             bIsWallRunning = true;
         }
