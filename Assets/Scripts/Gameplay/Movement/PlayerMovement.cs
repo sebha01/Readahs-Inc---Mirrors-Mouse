@@ -125,4 +125,9 @@ public class PlayerMovement : MonoBehaviour
         // Move the player.
         controller.Move(movement * Time.deltaTime);
     }
+
+    private bool isWallRunnable(RaycastHit wallHit)
+    {
+        return Mathf.Abs(wallHit.normal.y) < 0.2f;
+    }
 }
