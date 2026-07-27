@@ -27,9 +27,17 @@ public class PlayerMovement : MonoBehaviour
     [Header("Air Movement")]
     [SerializeField][Range(0.0f, 1.0f)] private float airControl = 0.35f;
 
+    [Header("Wall Detection")]
+    [SerializeField] private float wallCheckDistance = 0.75f;
+    [SerializeField] private LayerMask wallLayer;
+
     [Header("Other Stuff")]
     private Vector3 groundVelocity = Vector3.zero;
     private float verticalVelocity = 0.0f;
+    private RaycastHit leftWallHit;
+    private RaycastHit rightWallHit;
+    private bool bWallOnLeft = false;
+    private bool bWallOnRight = false;
 
     // Update is called once per frame
     void Update()
@@ -103,6 +111,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         Vector3 movement = groundVelocity + Vector3.up * verticalVelocity;
+
+        //================
+        // Wall Detection
+        //================
+        
+        // Fire a raycast to the right and left of the player and store if it collides with a wall.
+        bWallOnRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallCheckDistance, wallLayer);
+        bWallOnLeft= Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallCheckDistance, wallLayer);
+        
+        
 
         // Move the player.
         controller.Move(movement * Time.deltaTime);
